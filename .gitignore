@@ -1,0 +1,4 @@
+.venv
+.ollama
+models
+local_data

@@ -1,0 +1,33 @@
+services:
+  ollama:
+    image: ollama/ollama
+    ports:
+      - 11434:11434
+    expose:
+      - 11434
+    volumes:
+      - ./.ollama:/root/.ollama
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities:
+                - gpu
+  pgpt:
+    image: zylonai/private-gpt:latest
+    ports:
+      - 8001:8001
+    volumes:
+      - ./local_data/:/home/worker/app/local_data
+      - ./settings-docker.yml:/home/worker/app/settings-docker.yml
+    environment:
+      PORT: 8001
+      PGPT_PROFILES: docker
+      PGPT_MODE: ollama
+      PGPT_EMBED_MODE: ollama
+      PGPT_OLLAMA_API_BASE: http://ollama:11434
+      PGPT_OLLAMA_LLM_MODEL: tinyllama
+      PGPT_OLLAMA_EMBEDDING_MODEL: nomic-embed-text
+      PGPT_OLLAMA_KEEP_ALIVE: -1m

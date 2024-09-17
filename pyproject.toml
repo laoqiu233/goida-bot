@@ -1,0 +1,16 @@
+[tool.poetry]
+name = "goida-bot"
+version = "0.1.0"
+description = ""
+authors = ["Dmitri Tsiu <dmitrimeowsalot@gmail.com>"]
+readme = "README.md"
+packages = [{include = "goida_bot"}]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+gpt4all = "^2.8.2"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

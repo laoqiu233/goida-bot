@@ -1,0 +1,21 @@
+# GPU is not available in Docker on macos
+# You should start Ollama seperately on host machine
+
+services:
+  pgpt:
+  image: zylonai/private-gpt:latest
+  ports:
+    - 8001:8001
+  volumes:
+    - ./local_data/:/home/worker/app/local_data
+    - ./settings-docker.yml:/home/worker/app/settings-docker.yml
+  environment:
+    PORT: 8001
+    PGPT_PROFILES: docker
+    PGPT_MODE: ollama
+    PGPT_EMBED_MODE: ollama
+    PGPT_OLLAMA_API_BASE: http://host.docker.internal:11434
+    PGPT_OLLAMA_EMBEDDING_API_BASE: http://host.docker.internal:11434
+    PGPT_OLLAMA_LLM_MODEL: gemma2
+    PGPT_OLLAMA_EMBEDDING_MODEL: nomic-embed-text
+    PGPT_OLLAMA_KEEP_ALIVE: -1m

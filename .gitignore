@@ -1,5 +1,6 @@
 .venv
 .ollama
-models
+/models
 local_data
 content
+__pycache__

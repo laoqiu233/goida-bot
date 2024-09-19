@@ -1,13 +1,15 @@
-from pgpt_python.client import AsyncPrivateGPTApi
 import asyncio
-import httpx
+
 import feedparser
+import httpx
 import playwright
+from pgpt_python.client import AsyncPrivateGPTApi
 from playwright.async_api import async_playwright
 
 rss_source = "https://lenta.ru/rss"
 
 pgpt_client = AsyncPrivateGPTApi(base_url="http://localhost:8001")
+
 
 async def main():
     health_response = await pgpt_client.health.health()
@@ -17,7 +19,7 @@ async def main():
         resp = await client.get(rss_source)
 
     rss = feedparser.parse(resp.text)
-    
+
     for entry in rss.entries[:10]:
         uid = entry.link.removesuffix("/").split("/")[-1]
         print(f"Downloading {entry.title} {uid}")
@@ -46,7 +48,6 @@ async def main():
 
         await asyncio.sleep(0.5)
 
+
 if __name__ == "__main__":
     asyncio.run(main())
-
-

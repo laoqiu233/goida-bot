@@ -18,11 +18,10 @@ class Article(BaseModel):
     id: UUID
     token: int
 
-    link: str
+    url: str
     file_key: str
 
     summary: Optional[str]
     full_text: Optional[str]
-    is_embedded: bool
 
     feed: Feed

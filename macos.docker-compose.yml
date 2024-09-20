@@ -19,3 +19,9 @@ services:
       PGPT_OLLAMA_LLM_MODEL: gemma2
       PGPT_OLLAMA_EMBEDDING_MODEL: nomic-embed-text
       PGPT_OLLAMA_KEEP_ALIVE: -1m
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    environment:
+      - POSTGRES_PASSWORD=goida

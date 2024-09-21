@@ -1,7 +1,8 @@
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from common.settings import SharedSettings
 
 
-class FeedSettings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env")
-
+class FeedSettings(SharedSettings):
     feed_tokens_delay_seconds: float
+
+    feed_tokens: int
+    article_tokens: int

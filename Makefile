@@ -7,4 +7,7 @@ format:
 lint:
 	poetry run pylint $(CODE)
 
-.PHONY: format lint
+feeds:
+	cat make_feeds.sql | docker exec -i goida-bot-postgres-1 psql -U postgres
+
+.PHONY: format lint load_feeds

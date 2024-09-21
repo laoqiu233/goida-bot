@@ -13,7 +13,7 @@ class ArticlesDao(ABC):
         pass
 
     @abstractmethod
-    async def get_article_by_id(self, uuid: UUID) -> Optional[Article]:
+    async def get_article_by_id(self, article_id: UUID) -> Optional[Article]:
         pass
 
     @abstractmethod

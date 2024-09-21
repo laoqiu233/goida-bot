@@ -13,5 +13,5 @@ class FeedsDao(ABC):
         pass
 
     @abstractmethod
-    async def get_feed_by_id(self, id: UUID) -> Optional[Feed]:
+    async def get_feed_by_id(self, feed_id: UUID) -> Optional[Feed]:
         pass

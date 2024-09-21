@@ -1,6 +1,8 @@
-from pydantic_settings import BaseSettings
+from common.settings import SharedSettings
 
-class PostgresSettings(BaseSettings):
+
+class PostgresSettings(SharedSettings):
     database_url: str
+
 
 postgres_settings = PostgresSettings()

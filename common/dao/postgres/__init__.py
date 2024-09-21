@@ -1,0 +1,2 @@
+from common.dao.postgres.postgres_articles_dao import PostgresArticlesDao
+from common.dao.postgres.postgres_feeds_dao import PostgresFeedsDao

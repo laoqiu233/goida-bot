@@ -5,3 +5,4 @@ local_data
 content
 __pycache__
 .DS_store
+secrets.env

@@ -29,8 +29,8 @@ class PlaywrightArticlesRenderer(ArticlesRenderer):
             logger.error(
                 "Failed to fetch page %s with status %s, %s",
                 url,
-                response.status_text,
-                response.text,
+                response.status,
+                response.text(),
             )
         except PlaywrightError as e:
             logger.error("Error while fetching %s: %s", url, e)

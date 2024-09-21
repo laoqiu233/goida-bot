@@ -1,4 +1,4 @@
-from common.settings import ConfiguredSettings
+from common.settings.configured_settings import ConfiguredSettings
 
 
 class FeedsSettings(ConfiguredSettings):

@@ -4,8 +4,8 @@ from playwright.async_api import async_playwright
 
 from common.common_logging import setup_logging
 from common.dao.postgres import PostgresArticlesDao, PostgresFeedsDao
-from common.postgres.session import async_session
-from common.storage.local import LocalArticlesStorage
+from common.postgres.session import make_session
+from common.storage.s3 import S3ArticlesStorage
 from common.tokenization.impl.static_tokens_distributor import StaticTokensDistributor
 from fetcher.articles import ArticlesPipeline
 from fetcher.articles.articles_fetcher import ArticlesFetcher
@@ -18,6 +18,7 @@ async def main():
     async with async_playwright() as p:
         browser = await p.chromium.launch()
 
+        async_session = make_session(fetcher_settings)
         feeds_dao = PostgresFeedsDao(async_session)
         articles_dao = PostgresArticlesDao(async_session)
         feeds_tokens = StaticTokensDistributor.linear(fetcher_settings.feed_tokens)
@@ -26,7 +27,7 @@ async def main():
         )
 
         articles_renderer = PlaywrightArticlesRenderer(browser)
-        articles_storage = LocalArticlesStorage(fetcher_settings.articles_pdf_path)
+        articles_storage = S3ArticlesStorage(fetcher_settings)
         fetcher = ArticlesFetcher(articles_storage, articles_renderer)
 
         feeds_pipeline = FeedsPipeline(

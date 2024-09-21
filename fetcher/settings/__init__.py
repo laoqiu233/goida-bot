@@ -1,3 +1,10 @@
-from fetcher.settings.feed_settings import FeedSettings
+from fetcher.settings.articles_settings import ArticlesSettings
+from fetcher.settings.feeds_settings import FeedsSettings
 
-feed_settings_live = FeedSettings()
+
+class FetcherSettings:
+    feeds_settings: FeedsSettings
+    articles_settings: ArticlesSettings
+
+
+fetcher_settings = FetcherSettings()

@@ -14,3 +14,7 @@ class ArticlesStorage(ABC):
     @abstractmethod
     async def read(self, key: str) -> Optional[bytes]:
         pass
+
+    @abstractmethod
+    async def exists(self, key: str) -> bool:
+        pass

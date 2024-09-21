@@ -1,6 +1,6 @@
-from common.settings import SharedSettings
+from common.settings import ConfiguredSettings
 
 
-class FeedsSettings(SharedSettings):
+class FeedsSettings(ConfiguredSettings):
     feed_tokens_delay_seconds: float
     feed_tokens: int

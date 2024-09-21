@@ -20,17 +20,13 @@ async def main():
 
         feeds_dao = PostgresFeedsDao(async_session)
         articles_dao = PostgresArticlesDao(async_session)
-        feeds_tokens = StaticTokensDistributor.linear(
-            fetcher_settings.feeds_settings.feed_tokens
-        )
+        feeds_tokens = StaticTokensDistributor.linear(fetcher_settings.feed_tokens)
         articles_tokens = StaticTokensDistributor.linear(
-            fetcher_settings.articles_settings.article_tokens
+            fetcher_settings.article_tokens
         )
 
         articles_renderer = PlaywrightArticlesRenderer(browser)
-        articles_storage = LocalArticlesStorage(
-            fetcher_settings.articles_settings.articles_pdf_path
-        )
+        articles_storage = LocalArticlesStorage(fetcher_settings.articles_pdf_path)
         fetcher = ArticlesFetcher(articles_storage, articles_renderer)
 
         feeds_pipeline = FeedsPipeline(
@@ -40,7 +36,7 @@ async def main():
             articles_dao,
         )
         articles_pipeline = ArticlesPipeline(
-            fetcher_settings.articles_settings, articles_tokens, articles_dao, fetcher
+            fetcher_settings, articles_tokens, articles_dao, fetcher
         )
 
         feeds_task = asyncio.create_task(feeds_pipeline.run())

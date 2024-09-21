@@ -2,9 +2,8 @@ from fetcher.settings.articles_settings import ArticlesSettings
 from fetcher.settings.feeds_settings import FeedsSettings
 
 
-class FetcherSettings:
-    feeds_settings: FeedsSettings
-    articles_settings: ArticlesSettings
+class FetcherSettings(FeedsSettings, ArticlesSettings):
+    pass
 
 
 fetcher_settings = FetcherSettings()

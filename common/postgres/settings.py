@@ -1,7 +1,7 @@
-from common.settings import SharedSettings
+from common.settings import ConfiguredSettings
 
 
-class PostgresSettings(SharedSettings):
+class PostgresSettings(ConfiguredSettings):
     database_url: str
 
 

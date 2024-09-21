@@ -19,15 +19,14 @@ class FeedsPipeline:
         feeds_dao: FeedsDao,
         articles_dao: ArticlesDao,
     ):
-        self._feeds_settings = fetcher_settings.feeds_settings
-        self._articles_settings = fetcher_settings.articles_settings
+        self._fetcher_settings = fetcher_settings
         self._feed_tokens = feed_tokens
         self._feeds_dao = feeds_dao
         self._articles_dao = articles_dao
 
     async def run(self):
         async for token in self._feed_tokens.generate_tokens(
-            self._feeds_settings.feed_tokens_delay_seconds
+            self._fetcher_settings.feed_tokens_delay_seconds
         ):
             logger.debug("Parsing feeds with token %s", token)
             for feed in await self._feeds_dao.get_feeds(token=token):
@@ -55,7 +54,7 @@ class FeedsPipeline:
     async def process_entry(self, feed: Feed, entry: ParsedFeedEntry):
         entry_id = entry.link.removesuffix("/").split("/")[-1]
         article_key = f"{feed.slug}/{entry_id}"
-        article_token = hash(article_key) % self._articles_settings.article_tokens
+        article_token = hash(article_key) % self._fetcher_settings.article_tokens
 
         article = Article(
             id=uuid4(),

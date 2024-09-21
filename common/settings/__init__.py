@@ -1,1 +1,1 @@
-from common.settings.shared_settings import SharedSettings
+from common.settings.configured_settings import ConfiguredSettings

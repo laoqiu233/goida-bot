@@ -4,3 +4,4 @@ from common.settings.feeds_settings import FeedsSettings
 from common.settings.pgpt_settings import PgptSettings
 from common.settings.postgres_settings import PostgresSettings
 from common.settings.s3_settings import S3Settings
+from common.settings.telegram_settings import TelegramSettings

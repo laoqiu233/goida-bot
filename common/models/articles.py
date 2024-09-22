@@ -38,3 +38,13 @@ class DocumentChunk(BaseModel):
 
     id: str
     article_id: UUID
+
+
+class RankedDocumentChunk(BaseModel):
+    chunk: DocumentChunk
+    relevance: float
+
+
+class RankedArticles(BaseModel):
+    article: Article
+    relevance: float

@@ -21,6 +21,7 @@ services:
       PGPT_OLLAMA_LLM_MODEL: gemma2
       PGPT_OLLAMA_EMBEDDING_MODEL: nomic-embed-text
       PGPT_OLLAMA_KEEP_ALIVE: -1m
+    restart: always
   postgres:
     image: postgres
     ports:
@@ -29,6 +30,8 @@ services:
       - 5432
     environment:
       - POSTGRES_PASSWORD=goida
+    volumes:
+      - postgres:/var/lib/postgresql/data
   fetcher:
     build:
       dockerfile: docker/fetcher.Dockerfile
@@ -45,3 +48,5 @@ services:
       - .env
       - .env.secrets
     restart: always
+volumes:
+  postgres:

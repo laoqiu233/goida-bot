@@ -6,6 +6,8 @@ services:
     image: zylonai/private-gpt:latest
     ports:
       - 8001:8001
+    expose:
+      - 8001
     volumes:
       - ./local_data/:/home/worker/app/local_data
       - ./settings-docker.yml:/home/worker/app/settings-docker.yml
@@ -23,5 +25,23 @@ services:
     image: postgres
     ports:
       - 5432:5432
+    expose:
+      - 5432
     environment:
       - POSTGRES_PASSWORD=goida
+  fetcher:
+    build:
+      dockerfile: docker/fetcher.Dockerfile
+      context: .
+    env_file:
+      - .env
+      - .env.secrets
+    restart: always
+  indexer:
+    build:
+      dockerfile: docker/indexer.Dockerfile
+      context: .
+    env_file:
+      - .env
+      - .env.secrets
+    restart: always

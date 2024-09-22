@@ -64,6 +64,7 @@ class FeedsPipeline:
             summary=None,
             full_text=None,
             feed=feed,
+            chunks=[],
         )
 
         await self._articles_dao.put_article(article)

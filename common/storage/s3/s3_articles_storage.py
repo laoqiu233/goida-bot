@@ -38,7 +38,7 @@ class S3ArticlesStorage(ArticlesStorage):
             logger.error("Failed to store key %s to S3: %s", key, e)
 
     async def read(self, key: str) -> bytes | None:
-        if not self.exists(key):
+        if not await self.exists(key):
             return None
 
         try:
@@ -46,7 +46,7 @@ class S3ArticlesStorage(ArticlesStorage):
                 result = await s3.get_object(
                     Bucket=self._settings.s3_bucket, Key=self._append_suffix(key)
                 )
-                return result["Body"]
+                return await result["Body"].read()
         except ClientError as e:
             logger.error("Failed to read key %s from S3: %s", key, e)
 

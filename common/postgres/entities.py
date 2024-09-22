@@ -35,3 +35,11 @@ class ArticleEntity(Base):
 
     feed_id: Mapped[UUID] = mapped_column(ForeignKey("feeds.id"))
     feed: Mapped[FeedEntity] = relationship()
+    chunks: Mapped[list["DocumentChunkEntity"]] = relationship()
+
+
+class DocumentChunkEntity(Base):
+    __tablename__ = "document_chunks"
+
+    id: Mapped[str] = mapped_column(primary_key=True)
+    article_id: Mapped[UUID] = mapped_column(ForeignKey("articles.id"))

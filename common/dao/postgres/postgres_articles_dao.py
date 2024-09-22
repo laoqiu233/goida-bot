@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from sqlalchemy.orm import selectinload
 
 from common.dao import ArticlesDao
-from common.models.articles import Article
-from common.postgres.entities import ArticleEntity
+from common.models.articles import Article, DocumentChunk
+from common.postgres.entities import ArticleEntity, DocumentChunkEntity
 
 
 class PostgresArticlesDao(ArticlesDao):
@@ -17,12 +17,14 @@ class PostgresArticlesDao(ArticlesDao):
         self, token: int | None = None, embedded: bool | None = None
     ) -> list[Article]:
         async with self._async_session() as session:
-            stmt = select(ArticleEntity)
+            stmt = (
+                select(ArticleEntity)
+                .options(selectinload(ArticleEntity.feed))
+                .options(selectinload(ArticleEntity.chunks))
+            )
 
             if token is not None:
-                stmt = stmt.where(ArticleEntity.token == token).options(
-                    selectinload(ArticleEntity.feed)
-                )
+                stmt = stmt.where(ArticleEntity.token == token)
 
             if embedded is not None:
                 clause = (ArticleEntity.full_text.is_not(None)) & (
@@ -43,6 +45,7 @@ class PostgresArticlesDao(ArticlesDao):
                 select(ArticleEntity)
                 .where(ArticleEntity.id == article_id)
                 .options(selectinload(ArticleEntity.feed))
+                .options(selectinload(ArticleEntity.chunks))
             )
             result = await session.scalar(stmt)
 
@@ -54,6 +57,7 @@ class PostgresArticlesDao(ArticlesDao):
                 select(ArticleEntity)
                 .where(ArticleEntity.url == url)
                 .options(selectinload(ArticleEntity.feed))
+                .options(selectinload(ArticleEntity.chunks))
             )
             result = await session.scalar(stmt)
 
@@ -75,3 +79,29 @@ class PostgresArticlesDao(ArticlesDao):
             )
             session.add(entity)
             await session.commit()
+
+    async def add_chunk(self, document_chunk: DocumentChunk) -> None:
+        async with self._async_session() as session:
+            entity = DocumentChunkEntity(
+                id=document_chunk.id, article_id=document_chunk.article_id
+            )
+            session.add(entity)
+            await session.commit()
+
+    async def update_summary(self, article_id: UUID, summary: str) -> None:
+        async with self._async_session() as session:
+            stmt = select(ArticleEntity).where(ArticleEntity.id == article_id)
+            entity = await session.scalar(stmt)
+
+            if entity is not None:
+                entity.summary = summary
+                await session.commit()
+
+    async def update_full_text(self, article_id: UUID, full_text: str) -> None:
+        async with self._async_session() as session:
+            stmt = select(ArticleEntity).where(ArticleEntity.id == article_id)
+            entity = await session.scalar(stmt)
+
+            if entity is not None:
+                entity.full_text = full_text
+                await session.commit()

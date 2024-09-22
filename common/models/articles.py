@@ -28,5 +28,13 @@ class Article(BaseModel):
 
     summary: Optional[str]
     full_text: Optional[str]
+    chunks: list["DocumentChunk"]
 
     feed: Feed
+
+
+class DocumentChunk(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: str
+    article_id: UUID

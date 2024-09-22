@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Optional
 from uuid import UUID
 
-from common.models.articles import Article
+from common.models.articles import Article, DocumentChunk
 
 
 class ArticlesDao(ABC):
@@ -22,4 +22,16 @@ class ArticlesDao(ABC):
 
     @abstractmethod
     async def put_article(self, article: Article) -> None:
+        pass
+
+    @abstractmethod
+    async def add_chunk(self, document_chunk: DocumentChunk) -> None:
+        pass
+
+    @abstractmethod
+    async def update_summary(self, article_id: UUID, summary: str) -> None:
+        pass
+
+    @abstractmethod
+    async def update_full_text(self, article_id: UUID, full_text: str) -> None:
         pass

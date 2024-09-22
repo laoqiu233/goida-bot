@@ -1,53 +1,41 @@
 import asyncio
 
-import feedparser
-import httpx
-import playwright
 from pgpt_python.client import AsyncPrivateGPTApi
-from playwright.async_api import async_playwright
 
-rss_source = "https://lenta.ru/rss"
-
-pgpt_client = AsyncPrivateGPTApi(base_url="http://localhost:8001")
+from common.common_logging import setup_logging
+from common.dao.postgres import PostgresArticlesDao
+from common.postgres.session import make_session
+from common.storage.s3 import S3ArticlesStorage
+from common.tokenization.impl.static_tokens_distributor import StaticTokensDistributor
+from indexer.article_indexer import Indexer
+from indexer.indexer_pipeline import IndexerPipeline
+from indexer.services.embedding import EmbeddingService
+from indexer.services.prompt_storage import PromptStorage
+from indexer.services.prompting import PromptingService
+from indexer.settings import indexer_settings
 
 
 async def main():
-    health_response = await pgpt_client.health.health()
-    print(health_response.json())
+    pgpt_client = AsyncPrivateGPTApi(base_url=indexer_settings.pgpt_url)
 
-    async with httpx.AsyncClient() as client:
-        resp = await client.get(rss_source)
+    embed = EmbeddingService(pgpt_client)
+    prompt_storage = PromptStorage()
+    prompt = PromptingService(pgpt_client, prompt_storage)
 
-    rss = feedparser.parse(resp.text)
+    async_session = make_session(indexer_settings)
+    articles_dao = PostgresArticlesDao(async_session)
+    articles_storage = S3ArticlesStorage(indexer_settings)
 
-    for entry in rss.entries[:10]:
-        uid = entry.link.removesuffix("/").split("/")[-1]
-        print(f"Downloading {entry.title} {uid}")
+    articles_tokens = StaticTokensDistributor.linear(indexer_settings.article_tokens)
+    indexer = Indexer(embed, prompt, articles_storage, articles_dao)
 
-        async with async_playwright() as p:
-            browser = await p.chromium.launch()
-            page = await browser.new_page()
-            response = await page.goto(entry.link)
+    indexer_pipeline = IndexerPipeline(
+        articles_tokens, indexer_settings, articles_dao, indexer
+    )
 
-            if response is None:
-                print(f"no response for {uid}")
-                continue
-
-            if response.ok:
-                result = await page.pdf()
-                with open(f"content/{uid}.pdf", "wb") as file:
-                    file.write(result)
-
-                print(f"{uid} downloaded, embedding...")
-
-                with open(f"content/{uid}.pdf", "rb") as file:
-                    embed_response = await pgpt_client.ingestion.ingest_file(file=file)
-                    print(f"Embedding finished: {embed_response}")
-            else:
-                print(f"failed with {response.status}: {resp.text}")
-
-        await asyncio.sleep(0.5)
+    await indexer_pipeline.run()
 
 
 if __name__ == "__main__":
+    setup_logging()
     asyncio.run(main())

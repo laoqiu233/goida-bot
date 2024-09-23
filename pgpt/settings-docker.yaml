@@ -8,17 +8,6 @@ llm:
 embedding:
   mode: ${PGPT_EMBED_MODE:mock}
 
-llamacpp:
-  llm_hf_repo_id: ${PGPT_HF_REPO_ID:lmstudio-community/Meta-Llama-3.1-8B-Instruct-GGUF}
-  llm_hf_model_file: ${PGPT_HF_MODEL_FILE:Meta-Llama-3.1-8B-Instruct-Q4_K_M.gguf}
-
-huggingface:
-  embedding_hf_model_name: ${PGPT_EMBEDDING_HF_MODEL_NAME:nomic-ai/nomic-embed-text-v1.5}
-
-sagemaker:
-  llm_endpoint_name: ${PGPT_SAGEMAKER_LLM_ENDPOINT_NAME:}
-  embedding_endpoint_name: ${PGPT_SAGEMAKER_EMBEDDING_ENDPOINT_NAME:}
-
 ollama:
   llm_model: ${PGPT_OLLAMA_LLM_MODEL:llama3.1}
   embedding_model: ${PGPT_OLLAMA_EMBEDDING_MODEL:nomic-embed-text}
@@ -32,6 +21,19 @@ ollama:
   request_timeout: ${PGPT_OLLAMA_REQUEST_TIMEOUT:600.0}
   autopull_models: ${PGPT_OLLAMA_AUTOPULL_MODELS:true}
   keep_alive: ${PGPT_OLLAMA_KEEP_ALIVE:5m}
+
+nodestore:
+  database: postgres
+
+vectorstore:
+  database: postgres
+
+postgres:
+  host: ${POSTGRES_HOST:postgres}
+  port: ${POSTGRES_PORT:5432}
+  databse: ${POSTGRES_DB:postgres}
+  user: ${POSTGRES_USER:postgres}
+  password: ${POSTGRES_PASSWORD:hackme}
 
 ui:
   enabled: true

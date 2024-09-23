@@ -1,51 +1,54 @@
+# GPU is not available in Docker on macos
+# You should start Ollama seperately on host machine
+
 services:
-  ollama:
-    image: ollama/ollama
-    ports:
-      - 11434:11434
-    expose:
-      - 11434
-    volumes:
-      - ./.ollama:/root/.ollama
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities:
-                - gpu
   pgpt:
-    image: zylonai/private-gpt:latest
+    build:
+      context: ./
+      dockerfile: ./pgpt/Dockerfile
     ports:
       - 8001:8001
     expose:
       - 8001
     volumes:
-      - ./local_data/:/home/worker/app/local_data
-      - ./settings-docker.yml:/home/worker/app/settings-docker.yml
+      - ./pgpt/settings-docker.yaml:/home/worker/app/settings-docker.yaml
     environment:
       PORT: 8001
       PGPT_PROFILES: docker
       PGPT_MODE: ollama
       PGPT_EMBED_MODE: ollama
-      PGPT_OLLAMA_API_BASE: http://ollama:11434
-      PGPT_OLLAMA_EMBEDDING_API_BASE: http://ollama:11434
+      PGPT_OLLAMA_API_BASE: http://host.docker.internal:11434
+      PGPT_OLLAMA_EMBEDDING_API_BASE: http://host.docker.internal:11434
       PGPT_OLLAMA_LLM_MODEL: gemma2
       PGPT_OLLAMA_EMBEDDING_MODEL: nomic-embed-text
       PGPT_OLLAMA_KEEP_ALIVE: -1m
+      POSTGRES_PASSWORD: goida
+    restart: always
+  postgres:
+    image: pgvector/pgvector:pg16
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_PASSWORD=goida
+    volumes:
+      - postgres:/var/lib/postgresql/data
   fetcher:
     build:
       dockerfile: docker/fetcher.Dockerfile
       context: .
     env_file:
       - .env
-      - secrets.env
+      - .env.secrets
+    restart: always
   indexer:
     build:
       dockerfile: docker/indexer.Dockerfile
       context: .
     env_file:
       - .env
-      - secrets.env
-  
+      - .env.secrets
+    restart: always
+volumes:
+  postgres:

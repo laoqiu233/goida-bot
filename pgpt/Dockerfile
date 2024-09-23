@@ -1,4 +1,4 @@
-FROM python:3.11.6-slim-bookworm as base
+FROM python:3.11.6-slim-bookworm AS base
 
 # Install poetry
 RUN pip install pipx
@@ -10,7 +10,7 @@ ENV PATH=".venv/bin/:$PATH"
 # https://python-poetry.org/docs/configuration/#virtualenvsin-project
 ENV POETRY_VIRTUALENVS_IN_PROJECT=true
 
-FROM base as dependencies
+FROM base AS dependencies
 RUN apt update -y && apt install git -y
 WORKDIR /home/worker/app
 RUN git clone https://github.com/zylon-ai/private-gpt.git .
@@ -18,7 +18,7 @@ RUN git clone https://github.com/zylon-ai/private-gpt.git .
 ARG POETRY_EXTRAS="ui vector-stores-postgres storage-nodestore-postgres llms-ollama embeddings-ollama"
 RUN poetry install --no-root --extras "${POETRY_EXTRAS}"
 
-FROM base as app
+FROM base AS app
 ENV PYTHONUNBUFFERED=1
 ENV PORT=8080
 ENV APP_ENV=prod

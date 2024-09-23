@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Optional
 from uuid import UUID
 
@@ -33,11 +34,18 @@ class Article(BaseModel):
     feed: Feed
 
 
+class ChunkType(Enum):
+    RAW = 1
+    SUMMARY = 2
+    FULL_TEXT = 3
+
+
 class DocumentChunk(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     id: str
     article_id: UUID
+    chunk_type: ChunkType
 
 
 class RankedDocumentChunk(BaseModel):

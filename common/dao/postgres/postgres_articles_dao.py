@@ -83,7 +83,9 @@ class PostgresArticlesDao(ArticlesDao):
     async def add_chunk(self, document_chunk: DocumentChunk) -> None:
         async with self._async_session() as session:
             entity = DocumentChunkEntity(
-                id=document_chunk.id, article_id=document_chunk.article_id
+                id=document_chunk.id,
+                article_id=document_chunk.article_id,
+                chunk_type=document_chunk.chunk_type.value,
             )
             session.add(entity)
             await session.commit()

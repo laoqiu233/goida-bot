@@ -43,3 +43,4 @@ class DocumentChunkEntity(Base):
 
     id: Mapped[str] = mapped_column(primary_key=True)
     article_id: Mapped[UUID] = mapped_column(ForeignKey("articles.id"))
+    chunk_type: Mapped[int]

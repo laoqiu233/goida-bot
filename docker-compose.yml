@@ -11,7 +11,7 @@ services:
     expose:
       - 8001
     volumes:
-      - ./pgpt/settings-docker.yaml:/home/worker/app/settings-docker.yaml
+     - ./pgpt/settings-docker.yaml:/home/worker/app/settings-docker.yaml
     environment:
       PORT: 8001
       PGPT_PROFILES: docker
@@ -21,7 +21,6 @@ services:
       PGPT_OLLAMA_EMBEDDING_API_BASE: http://host.docker.internal:11434
       PGPT_OLLAMA_LLM_MODEL: gemma2
       PGPT_OLLAMA_EMBEDDING_MODEL: nomic-embed-text
-      PGPT_OLLAMA_KEEP_ALIVE: -1m
       POSTGRES_PASSWORD: goida
     restart: always
   postgres:

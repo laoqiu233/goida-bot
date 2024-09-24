@@ -39,7 +39,7 @@ async def search_command(
 async def answer_search_result(message: Message, articles: list[RankedArticle]):
     rendered_articles = []
 
-    for article in articles:
+    for article in articles[:5]:
         rendered_articles.append(
             as_section(
                 Bold(article.article.title),

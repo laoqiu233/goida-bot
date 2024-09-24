@@ -24,6 +24,8 @@ class SearchService:
         for article in articles:
             chunks += [*filter(lambda x: x.chunk_type == ChunkType.SUMMARY, article.chunks)]
 
+        logger.info("Searching for %s with %s chunks", term, len(chunks))
+
         ranked_chunks = await self.search_chunks(chunks, term)
 
         article_chunks: dict[UUID, list[RankedDocumentChunk]] = {}
@@ -37,6 +39,8 @@ class SearchService:
                 relevance_sum += chunk.relevance
 
             article_mean_relevance[article_id] = relevance_sum / len(article_chunks[article_id])
+
+        logger.info("Search for %s returned %s chunks from %s articles", term, len(ranked_chunks), len(article_chunks))
 
         sorted_article_ids = list(article_mean_relevance.keys())
         sorted_article_ids.sort(key=article_mean_relevance.__getitem__, reverse=True)
@@ -94,8 +98,6 @@ class SearchService:
                 chunk=DocumentChunk(id=chunk.document.doc_id, article_id=article_id, chunk_type=ChunkType.FULL_TEXT),
                 relevance=chunk.score,
             )
-
-            logger.info("Got chunk %s, text: %s", ranked_chunk, chunk.text)
 
             ranked_chunks.append(ranked_chunk)
 

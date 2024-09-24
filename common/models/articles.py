@@ -24,6 +24,7 @@ class Article(BaseModel):
     id: UUID
     token: int
 
+    title: str
     url: str
     file_key: str
 

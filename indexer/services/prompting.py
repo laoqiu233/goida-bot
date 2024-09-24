@@ -44,7 +44,7 @@ class PromptingService:
             chunks, self._prompt_storage.summarize_prompt()
         )
 
-    async def full_text(self, chunks: list[DocumentChunk]):
+    async def full_text(self, title: str, chunks: list[DocumentChunk]):
         return await self.prompt_from_chunks(
-            chunks, self._prompt_storage.full_text_prompt()
+            chunks, self._prompt_storage.full_text_prompt(title)
         )

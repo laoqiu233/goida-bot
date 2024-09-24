@@ -71,6 +71,7 @@ class PostgresArticlesDao(ArticlesDao):
             entity = ArticleEntity(
                 id=article.id,
                 token=article.token,
+                title=article.title,
                 url=article.url,
                 file_key=article.file_key,
                 summary=article.summary,

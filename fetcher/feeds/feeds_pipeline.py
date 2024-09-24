@@ -59,6 +59,7 @@ class FeedsPipeline:
         article = Article(
             id=uuid4(),
             token=article_token,
+            title=entry.title,
             url=entry.link,
             file_key=article_key,
             summary=None,

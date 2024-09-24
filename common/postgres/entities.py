@@ -27,6 +27,7 @@ class ArticleEntity(Base):
 
     id: Mapped[UUID] = mapped_column(primary_key=True)
     token: Mapped[int]
+    title: Mapped[str]
     url: Mapped[str]
     file_key: Mapped[str]
 

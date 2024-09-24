@@ -6,6 +6,7 @@ from common.models.articles import Article, ChunkType, DocumentChunk
 from common.storage import ArticlesStorage
 from indexer.services.embedding import EmbeddingService
 from indexer.services.prompting import PromptingService
+from pgpt_python.core import ApiError
 
 logger = getLogger(__name__)
 
@@ -43,6 +44,8 @@ class Indexer:
             summary_chunks = await self._embed_summary(article, summary_chunks)
         except IndexingError as e:
             logger.warning("Failed to index article %s: %s", article.id, e.msg)
+        except ApiError as e:
+            logger.warning("Got error from pgpt when indexing article %s: %s", article.id, e)
 
     async def _embed_raw(
         self, article: Article, raw_chunks: list[DocumentChunk]
@@ -59,7 +62,7 @@ class Indexer:
 
             raw_chunks = await self._embed.embed_file(
                 article.id, article.file_key, article_file
-            )
+            )   
 
             logger.info(
                 "Generated %s raw chunks for article %s",
@@ -83,7 +86,7 @@ class Indexer:
             raise IndexingError(f"Article {article.id} with no raw chunks reach prompting")
         
         logger.info("Article %s has no full text, prompting", article.file_key)
-        full_text = await self._prompt.full_text(raw_chunks)
+        full_text = await self._prompt.full_text(article.title, raw_chunks)
 
         if full_text is None:
             raise IndexingError(f"Failed to generate full text for article {article.file_key}")

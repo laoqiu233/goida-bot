@@ -19,8 +19,9 @@ services:
       PGPT_EMBED_MODE: ollama
       PGPT_OLLAMA_API_BASE: http://host.docker.internal:11434
       PGPT_OLLAMA_EMBEDDING_API_BASE: http://host.docker.internal:11434
-      PGPT_OLLAMA_LLM_MODEL: gemma2
-      PGPT_OLLAMA_EMBEDDING_MODEL: nomic-embed-text
+      PGPT_OLLAMA_LLM_MODEL: my-model
+      PGPT_OLLAMA_EMBEDDING_MODEL: my-embed
+      PGPT_EMBED_DIM: 1024
       POSTGRES_PASSWORD: goida
     restart: always
   postgres:

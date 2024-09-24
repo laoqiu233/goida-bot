@@ -34,7 +34,6 @@ class Article(BaseModel):
 
     feed: Feed
 
-
 class ChunkType(Enum):
     RAW = 1
     SUMMARY = 2
@@ -54,6 +53,7 @@ class RankedDocumentChunk(BaseModel):
     relevance: float
 
 
-class RankedArticles(BaseModel):
+class RankedArticle(BaseModel):
     article: Article
-    relevance: float
+    ranked_chunks: list["RankedDocumentChunk"]
+    mean_relevance: float

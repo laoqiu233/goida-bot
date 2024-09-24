@@ -11,7 +11,7 @@ from aiogram.utils.formatting import (
 )
 
 from bot.utils import validate_search_term
-from common.models.articles import Article
+from common.models.articles import RankedArticle
 from common.services.search_service import SearchService
 
 router = Router(name="search")
@@ -36,19 +36,20 @@ async def search_command(
     await answer_search_result(message, result)
 
 
-async def answer_search_result(message: Message, articles: list[Article]):
+async def answer_search_result(message: Message, articles: list[RankedArticle]):
     rendered_articles = []
 
     for article in articles:
         rendered_articles.append(
             as_section(
-                Bold(article.file_key),
-                as_line(BlockQuote(article.summary)),
+                Bold(article.article.title),
+                as_line(BlockQuote(article.article.summary)),
                 as_line(
                     TextLink(
-                        f"Читать полностью на {article.feed.feed_name}", url=article.url
+                        f"Читать полностью на {article.article.feed.feed_name}", url=article.article.url
                     )
                 ),
+                as_line(f"Найдено {len(article.ranked_chunks)} чанков, средняя релевантность {article.mean_relevance}")
             )
         )
 

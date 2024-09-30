@@ -7,3 +7,4 @@ class S3Settings(ConfiguredSettings):
     s3_region: str
     s3_key: str
     s3_secret: str
+    s3_enabled: bool

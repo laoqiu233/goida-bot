@@ -32,7 +32,11 @@ class ArticlesPipeline:
     async def process_token(self, token: int):
         articles = await self._articles_dao.get_articles(token=token, embedded=False)
         logger.info("Rendering %s articles with token %s", len(articles), token)
-        await asyncio.gather(*map(self.process_article, articles))
+        batch_size = 5
+
+        for batch_index in range(0, len(articles), batch_size):
+            batch = articles[batch_index : (batch_index + batch_size)]
+            await asyncio.gather(*map(self.process_article, batch))
 
     async def process_article(self, article: Article):
         await self._fetcher.fetch_and_store(article.url, article.file_key)

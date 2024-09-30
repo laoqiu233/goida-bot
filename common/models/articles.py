@@ -34,6 +34,7 @@ class Article(BaseModel):
 
     feed: Feed
 
+
 class ChunkType(Enum):
     RAW = 1
     SUMMARY = 2

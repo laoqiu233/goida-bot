@@ -1,4 +1,4 @@
-from collections import namedtuple
+from itertools import groupby
 from logging import getLogger
 from uuid import UUID
 
@@ -6,11 +6,15 @@ from pgpt_python.client import AsyncPrivateGPTApi
 from pgpt_python.types import ContextFilter
 
 from common.dao import ArticlesDao
-from common.models.articles import Article, DocumentChunk, RankedDocumentChunk, ChunkType, RankedArticle
-
-from itertools import groupby
+from common.models.articles import (
+    ChunkType,
+    DocumentChunk,
+    RankedArticle,
+    RankedDocumentChunk,
+)
 
 logger = getLogger(__name__)
+
 
 class SearchService:
     def __init__(self, pgpt: AsyncPrivateGPTApi, articles_dao: ArticlesDao):
@@ -22,7 +26,9 @@ class SearchService:
         chunks = []
 
         for article in articles:
-            chunks += [*filter(lambda x: x.chunk_type == ChunkType.SUMMARY, article.chunks)]
+            chunks += [
+                *filter(lambda x: x.chunk_type == ChunkType.SUMMARY, article.chunks)
+            ]
 
         logger.info("Searching for %s with %s chunks", term, len(chunks))
 
@@ -31,16 +37,25 @@ class SearchService:
         article_chunks: dict[UUID, list[RankedDocumentChunk]] = {}
         article_mean_relevance: dict[UUID, float] = {}
 
-        for article_id, chunks in groupby(ranked_chunks, key=lambda chunk: chunk.chunk.article_id):
+        for article_id, chunks in groupby(
+            ranked_chunks, key=lambda chunk: chunk.chunk.article_id
+        ):
             article_chunks[article_id] = list(chunks)
             relevance_sum = 0
 
             for chunk in article_chunks[article_id]:
                 relevance_sum += chunk.relevance
 
-            article_mean_relevance[article_id] = relevance_sum / len(article_chunks[article_id])
+            article_mean_relevance[article_id] = relevance_sum / len(
+                article_chunks[article_id]
+            )
 
-        logger.info("Search for %s returned %s chunks from %s articles", term, len(ranked_chunks), len(article_chunks))
+        logger.info(
+            "Search for %s returned %s chunks from %s articles",
+            term,
+            len(ranked_chunks),
+            len(article_chunks),
+        )
 
         sorted_article_ids = list(article_mean_relevance.keys())
         sorted_article_ids.sort(key=article_mean_relevance.__getitem__, reverse=True)
@@ -54,11 +69,13 @@ class SearchService:
                 logger.warning("Sorted article %s not found", article_id)
                 continue
 
-            ranked_articles.append(RankedArticle(
-                article=article,
-                ranked_chunks=article_chunks[article_id],
-                mean_relevance=article_mean_relevance[article_id]
-            ))
+            ranked_articles.append(
+                RankedArticle(
+                    article=article,
+                    ranked_chunks=article_chunks[article_id],
+                    mean_relevance=article_mean_relevance[article_id],
+                )
+            )
 
         return ranked_articles
 
@@ -95,7 +112,11 @@ class SearchService:
             article_id = chunk_to_article[chunk.document.doc_id]
 
             ranked_chunk = RankedDocumentChunk(
-                chunk=DocumentChunk(id=chunk.document.doc_id, article_id=article_id, chunk_type=ChunkType.FULL_TEXT),
+                chunk=DocumentChunk(
+                    id=chunk.document.doc_id,
+                    article_id=article_id,
+                    chunk_type=ChunkType.FULL_TEXT,
+                ),
                 relevance=chunk.score,
             )
 

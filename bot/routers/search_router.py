@@ -46,10 +46,14 @@ async def answer_search_result(message: Message, articles: list[RankedArticle]):
                 as_line(BlockQuote(article.article.summary)),
                 as_line(
                     TextLink(
-                        f"Читать полностью на {article.article.feed.feed_name}", url=article.article.url
+                        f"Читать полностью на {article.article.feed.feed_name}",
+                        url=article.article.url,
                     )
                 ),
-                as_line(f"Найдено {len(article.ranked_chunks)} чанков, средняя релевантность {article.mean_relevance}")
+                as_line(
+                    f"Найдено {len(article.ranked_chunks)} чанков, "
+                    f"средняя релевантность {article.mean_relevance}"
+                ),
             )
         )
 

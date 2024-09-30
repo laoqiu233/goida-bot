@@ -30,7 +30,6 @@ class PromptStorage:
         "называется %s"
     )
 
-
     def summarize_prompt(self) -> str:
         return self.ru_summarize
 

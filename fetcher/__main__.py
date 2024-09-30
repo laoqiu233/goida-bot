@@ -5,6 +5,7 @@ from playwright.async_api import async_playwright
 from common.common_logging import setup_logging
 from common.dao.postgres import PostgresArticlesDao, PostgresFeedsDao
 from common.postgres.session import make_session
+from common.storage.local import LocalArticlesStorage
 from common.storage.s3 import S3ArticlesStorage
 from common.tokenization.impl.static_tokens_distributor import StaticTokensDistributor
 from fetcher.articles import ArticlesPipeline
@@ -27,7 +28,10 @@ async def main():
         )
 
         articles_renderer = PlaywrightArticlesRenderer(browser)
-        articles_storage = S3ArticlesStorage(fetcher_settings)
+        if fetcher_settings.s3_enabled:
+            articles_storage = S3ArticlesStorage(fetcher_settings)
+        else:
+            articles_storage = LocalArticlesStorage(fetcher_settings.articles_pdf_path)
         fetcher = ArticlesFetcher(articles_storage, articles_renderer)
 
         feeds_pipeline = FeedsPipeline(

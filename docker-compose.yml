@@ -34,10 +34,16 @@ services:
       - POSTGRES_PASSWORD=goida
     volumes:
       - postgres:/var/lib/postgresql/data
+  migrate:
+    build:
+      dockerfile: docker/migrate.Dockerfile
+      context: .
   fetcher:
     build:
       dockerfile: docker/fetcher.Dockerfile
       context: .
+    volumes:
+      - ./content:/app/content
     env_file:
       - .env
       - .env.secrets
@@ -46,6 +52,8 @@ services:
     build:
       dockerfile: docker/indexer.Dockerfile
       context: .
+    volumes:
+      - ./content:/app/content
     env_file:
       - .env
       - .env.secrets

@@ -5,6 +5,7 @@ from pgpt_python.client import AsyncPrivateGPTApi
 from common.common_logging import setup_logging
 from common.dao.postgres import PostgresArticlesDao
 from common.postgres.session import make_session
+from common.storage.local import LocalArticlesStorage
 from common.storage.s3 import S3ArticlesStorage
 from common.tokenization.impl.static_tokens_distributor import StaticTokensDistributor
 from indexer.article_indexer import Indexer
@@ -24,7 +25,11 @@ async def main():
 
     async_session = make_session(indexer_settings)
     articles_dao = PostgresArticlesDao(async_session)
-    articles_storage = S3ArticlesStorage(indexer_settings)
+
+    if indexer_settings.s3_enabled:
+        articles_storage = S3ArticlesStorage(indexer_settings)
+    else:
+        articles_storage = LocalArticlesStorage(indexer_settings.articles_pdf_path)
 
     articles_tokens = StaticTokensDistributor.linear(indexer_settings.article_tokens)
     indexer = Indexer(embed, prompt, articles_storage, articles_dao)

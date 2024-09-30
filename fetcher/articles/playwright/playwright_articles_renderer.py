@@ -16,7 +16,7 @@ class PlaywrightArticlesRenderer(ArticlesRenderer):
         try:
             page = await self._browser.new_page()
 
-            response = await page.goto(url)
+            response = await page.goto(url, timeout=0)
             if response is None:
                 logger.error("No response for url %s", url)
                 return

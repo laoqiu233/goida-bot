@@ -1,14 +1,16 @@
 from itertools import groupby
 from logging import getLogger
 
+from pgpt_python.core import ApiError
+
 from common.dao import ArticlesDao
 from common.models.articles import Article, ChunkType, DocumentChunk
 from common.storage import ArticlesStorage
 from indexer.services.embedding import EmbeddingService
 from indexer.services.prompting import PromptingService
-from pgpt_python.core import ApiError
 
 logger = getLogger(__name__)
+
 
 class IndexingError(Exception):
     def __init__(self, msg: str):
@@ -45,7 +47,9 @@ class Indexer:
         except IndexingError as e:
             logger.warning("Failed to index article %s: %s", article.id, e.msg)
         except ApiError as e:
-            logger.warning("Got error from pgpt when indexing article %s: %s", article.id, e)
+            logger.warning(
+                "Got error from pgpt when indexing article %s: %s", article.id, e
+            )
 
     async def _embed_raw(
         self, article: Article, raw_chunks: list[DocumentChunk]
@@ -62,7 +66,7 @@ class Indexer:
 
             raw_chunks = await self._embed.embed_file(
                 article.id, article.file_key, article_file
-            )   
+            )
 
             logger.info(
                 "Generated %s raw chunks for article %s",
@@ -71,32 +75,39 @@ class Indexer:
             )
 
             if len(raw_chunks) == 0:
-                raise IndexingError(f"Article {article.file_key} generated no raw chunks")
+                raise IndexingError(
+                    f"Article {article.file_key} generated no raw chunks"
+                )
 
             for chunk in raw_chunks:
                 await self._articles_dao.add_chunk(chunk)
 
         return raw_chunks
-    
-    async def _generate_full_text(self, article: Article, raw_chunks: list[DocumentChunk]):
+
+    async def _generate_full_text(
+        self, article: Article, raw_chunks: list[DocumentChunk]
+    ):
         if article.full_text is not None:
             return
-        
+
         if len(raw_chunks) == 0:
-            raise IndexingError(f"Article {article.id} with no raw chunks reach prompting")
-        
+            raise IndexingError(
+                f"Article {article.id} with no raw chunks reach prompting"
+            )
+
         logger.info("Article %s has no full text, prompting", article.file_key)
         full_text = await self._prompt.full_text(article.title, raw_chunks)
 
         if full_text is None:
-            raise IndexingError(f"Failed to generate full text for article {article.file_key}")
-        
+            raise IndexingError(
+                f"Failed to generate full text for article {article.file_key}"
+            )
+
         logger.info(
             "Generated full text for article %s: %s",
             article.file_key,
             full_text,
         )
-
 
         await self._articles_dao.update_full_text(article.id, full_text)
         article.full_text = full_text
@@ -105,7 +116,9 @@ class Indexer:
         self, article: Article, full_text_chunks: list[DocumentChunk]
     ) -> list[DocumentChunk]:
         if article.full_text is None:
-            raise IndexingError(f"Article {article.file_key} with no full text reached embedding")
+            raise IndexingError(
+                f"Article {article.file_key} with no full text reached embedding"
+            )
 
         if len(full_text_chunks) == 0:
             logger.info(
@@ -123,26 +136,34 @@ class Indexer:
             )
 
             if len(full_text_chunks) == 0:
-                raise IndexingError(f"Article {article.file_key} generated no full text chunks")
+                raise IndexingError(
+                    f"Article {article.file_key} generated no full text chunks"
+                )
 
             for chunk in full_text_chunks:
                 await self._articles_dao.add_chunk(chunk)
 
         return full_text_chunks
-    
-    async def _generate_summary(self, article: Article, full_text_chunks: list[DocumentChunk]):
+
+    async def _generate_summary(
+        self, article: Article, full_text_chunks: list[DocumentChunk]
+    ):
         if article.summary is not None:
             return
-        
+
         if len(full_text_chunks) == 0:
-            raise IndexingError(f"Artilce {article.id} with no full text chunks reached prompting")
-        
+            raise IndexingError(
+                f"Artilce {article.id} with no full text chunks reached prompting"
+            )
+
         logger.info("Article %s has no summary, prompting", article.file_key)
         summary = await self._prompt.summarize(full_text_chunks)
 
         if summary is None:
-            raise IndexingError(f"Failed to generate summary for article {article.file_key}")
-        
+            raise IndexingError(
+                f"Failed to generate summary for article {article.file_key}"
+            )
+
         logger.info(
             "Generated summary for article %s: %s",
             article.file_key,
@@ -155,7 +176,9 @@ class Indexer:
         self, article: Article, summary_chunks: list[DocumentChunk]
     ) -> list[DocumentChunk]:
         if article.summary is None:
-            raise IndexingError(f"Article {article.id} with no summary reached embedding")
+            raise IndexingError(
+                f"Article {article.id} with no summary reached embedding"
+            )
 
         if len(summary_chunks) == 0:
             logger.info(
@@ -173,7 +196,9 @@ class Indexer:
             )
 
             if len(summary_chunks) == 0:
-                raise IndexingError(f"Article {article.file_key} generated no summary chunks")
+                raise IndexingError(
+                    f"Article {article.file_key} generated no summary chunks"
+                )
 
             for chunk in summary_chunks:
                 await self._articles_dao.add_chunk(chunk)

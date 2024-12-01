@@ -1,3 +1,4 @@
+import datetime
 from logging import getLogger
 from uuid import uuid4
 
@@ -7,7 +8,6 @@ from common.tokenization.tokens_distributor import TokensDistributor
 from fetcher.feeds.feed_parser import parse_feed
 from fetcher.models.feeds import ParsedFeedEntry
 from fetcher.settings import FetcherSettings
-import datetime
 
 logger = getLogger(__name__)
 
@@ -64,7 +64,7 @@ class FeedsPipeline:
             entry.published_parsed[4],
             entry.published_parsed[5],
             0,
-            tzinfo=datetime.UTC
+            tzinfo=datetime.UTC,
         )
 
         article = Article(

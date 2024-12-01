@@ -8,7 +8,10 @@ from common.models.articles import Article, DocumentChunk
 class ArticlesDao(ABC):
     @abstractmethod
     async def get_articles(
-        self, token: Optional[int] = None, embedded: Optional[bool] = None, time_range: Optional[int] = None
+        self,
+        token: Optional[int] = None,
+        embedded: Optional[bool] = None,
+        time_range: Optional[int] = None,
     ) -> list[Article]:
         pass
 

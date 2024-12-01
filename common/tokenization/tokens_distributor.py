@@ -4,6 +4,7 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 
+
 class TokensDistributor(ABC):
     """
     Manages tokens distributed across multiple instances.
@@ -46,7 +47,9 @@ class TokensDistributor(ABC):
 
             if i in my_tokens:
                 yield i
-                logger.debug(f"Finished token {i}, sleeping for {delay_seconds} seconds")
+                logger.debug(
+                    f"Finished token {i}, sleeping for {delay_seconds} seconds"
+                )
                 await asyncio.sleep(delay_seconds)
 
             i = (i + 1) % total_tokens

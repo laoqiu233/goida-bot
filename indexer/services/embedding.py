@@ -25,7 +25,7 @@ class EmbeddingService:
         ]
 
         return chunks
-    
+
     async def remove_embeds(self, chunks: list[DocumentChunk]):
         for chunk in chunks:
             await self._pgpt.ingestion.delete_ingested(chunk.id)

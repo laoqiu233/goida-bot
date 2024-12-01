@@ -39,7 +39,7 @@ class Indexer:
         summary_chunks = list(grouped_chunks.get(ChunkType.SUMMARY, []))
 
         try:
-            if (len(full_text_chunks) <= 0):
+            if len(full_text_chunks) <= 0:
                 raw_chunks = await self._embed_raw(article, raw_chunks)
             await self._generate_full_text(article, raw_chunks)
             full_text_chunks = await self._embed_full_text(article, full_text_chunks)

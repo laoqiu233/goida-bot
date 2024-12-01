@@ -26,11 +26,11 @@ class PlaywrightArticlesRenderer(ArticlesRenderer):
             page = await self._context.new_page()
 
             response = await page.goto(url, timeout=0)
-            
+
             if response is None:
                 logger.error("No response for url %s", url)
                 return
-    
+
             if response.ok:
                 result = await page.pdf()
                 logger.info("Fetched page %s size %s bytes", url, len(result))

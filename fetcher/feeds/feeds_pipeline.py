@@ -7,6 +7,7 @@ from common.tokenization.tokens_distributor import TokensDistributor
 from fetcher.feeds.feed_parser import parse_feed
 from fetcher.models.feeds import ParsedFeedEntry
 from fetcher.settings import FetcherSettings
+import datetime
 
 logger = getLogger(__name__)
 
@@ -55,12 +56,23 @@ class FeedsPipeline:
         entry_id = entry.link.removesuffix("/").split("/")[-1]
         article_key = f"{feed.slug}/{entry_id}"
         article_token = hash(article_key) % self._fetcher_settings.article_tokens
+        published = datetime.datetime(
+            entry.published_parsed[0],
+            entry.published_parsed[1],
+            entry.published_parsed[2],
+            entry.published_parsed[3],
+            entry.published_parsed[4],
+            entry.published_parsed[5],
+            0,
+            tzinfo=datetime.UTC
+        )
 
         article = Article(
             id=uuid4(),
             token=article_token,
             title=entry.title,
             url=entry.link,
+            published=published,
             file_key=article_key,
             summary=None,
             full_text=None,

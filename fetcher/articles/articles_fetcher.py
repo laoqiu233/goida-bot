@@ -12,6 +12,8 @@ class ArticlesFetcher:
         self._renderer = renderer
 
     async def fetch_and_store(self, url: str, file_key: str):
+        logger.debug("Started processing article %s", file_key)
+
         if await self._storage.exists(file_key):
             logger.debug("Article %s already stored, skipping", file_key)
             return

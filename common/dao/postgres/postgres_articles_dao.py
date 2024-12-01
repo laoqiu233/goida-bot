@@ -8,13 +8,15 @@ from common.dao import ArticlesDao
 from common.models.articles import Article, DocumentChunk
 from common.postgres.entities import ArticleEntity, DocumentChunkEntity
 
+import time
+
 
 class PostgresArticlesDao(ArticlesDao):
     def __init__(self, async_session: async_sessionmaker[AsyncSession]):
         self._async_session = async_session
 
     async def get_articles(
-        self, token: int | None = None, embedded: bool | None = None
+        self, token: int | None = None, embedded: bool | None = None, time_range: int | None = None
     ) -> list[Article]:
         async with self._async_session() as session:
             stmt = (
@@ -32,6 +34,12 @@ class PostgresArticlesDao(ArticlesDao):
                 )
                 if not embedded:
                     clause = ~clause
+
+                stmt = stmt.where(clause)
+
+            if time_range is not None:
+                from_time = int(time.time() - time_range)
+                clause = (ArticleEntity.published >= from_time)
 
                 stmt = stmt.where(clause)
 
@@ -73,6 +81,7 @@ class PostgresArticlesDao(ArticlesDao):
                 token=article.token,
                 title=article.title,
                 url=article.url,
+                published=article.published.timestamp(),
                 file_key=article.file_key,
                 summary=article.summary,
                 full_text=article.full_text,
@@ -90,6 +99,13 @@ class PostgresArticlesDao(ArticlesDao):
             )
             session.add(entity)
             await session.commit()
+    
+    async def remove_chunk(self, document_chunk: DocumentChunk) -> None:
+        async with self._async_session() as session:
+            chunk_entity = await session.get(DocumentChunkEntity, document_chunk.id)
+            if chunk_entity is not None:
+                await session.delete(chunk_entity)
+                await session.commit()
 
     async def update_summary(self, article_id: UUID, summary: str) -> None:
         async with self._async_session() as session:

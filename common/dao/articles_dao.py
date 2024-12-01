@@ -8,7 +8,7 @@ from common.models.articles import Article, DocumentChunk
 class ArticlesDao(ABC):
     @abstractmethod
     async def get_articles(
-        self, token: Optional[int] = None, embedded: Optional[bool] = None
+        self, token: Optional[int] = None, embedded: Optional[bool] = None, time_range: Optional[int] = None
     ) -> list[Article]:
         pass
 
@@ -26,6 +26,10 @@ class ArticlesDao(ABC):
 
     @abstractmethod
     async def add_chunk(self, document_chunk: DocumentChunk) -> None:
+        pass
+
+    @abstractmethod
+    async def remove_chunk(self, document_chunk: DocumentChunk) -> None:
         pass
 
     @abstractmethod

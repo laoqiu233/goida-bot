@@ -30,6 +30,7 @@ class ArticleEntity(Base):
     title: Mapped[str]
     url: Mapped[str]
     file_key: Mapped[str]
+    published: Mapped[int]
 
     summary: Mapped[Optional[str]]
     full_text: Mapped[Optional[str]]

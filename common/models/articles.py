@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import Optional
 from uuid import UUID
+from datetime import datetime
 
 from pydantic import BaseModel, ConfigDict
 
@@ -26,6 +27,7 @@ class Article(BaseModel):
 
     title: str
     url: str
+    published: datetime
     file_key: str
 
     summary: Optional[str]

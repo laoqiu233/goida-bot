@@ -8,6 +8,7 @@ class ParsedFeedEntry(BaseModel):
 
     title: str
     link: str
+    published_parsed: tuple
 
 
 class ParsedFeed(BaseModel):

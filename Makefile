@@ -13,4 +13,7 @@ feeds:
 indexed:
 	cat indexed_count.sql | docker exec -i goida-bot-postgres-1 psql -U postgres
 
-.PHONY: format lint load_feeds
+ask:
+	poetry run python -m asker
+
+.PHONY: format lint load_feeds ask

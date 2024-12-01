@@ -25,6 +25,10 @@ class EmbeddingService:
         ]
 
         return chunks
+    
+    async def remove_embeds(self, chunks: list[DocumentChunk]):
+        for chunk in chunks:
+            await self._pgpt.ingestion.delete_ingested(chunk.id)
 
     async def embed_full_text(
         self, article_id: UUID, file_key: str, full_text: str

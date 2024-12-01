@@ -17,8 +17,6 @@ from fetcher.settings import fetcher_settings
 
 async def main():
     async with async_playwright() as p:
-        browser = await p.chromium.launch()
-
         async_session = make_session(fetcher_settings)
         feeds_dao = PostgresFeedsDao(async_session)
         articles_dao = PostgresArticlesDao(async_session)
@@ -27,7 +25,7 @@ async def main():
             fetcher_settings.article_tokens
         )
 
-        articles_renderer = PlaywrightArticlesRenderer(browser)
+        articles_renderer = PlaywrightArticlesRenderer(p)
         if fetcher_settings.s3_enabled:
             articles_storage = S3ArticlesStorage(fetcher_settings)
         else:

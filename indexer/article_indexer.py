@@ -39,11 +39,15 @@ class Indexer:
         summary_chunks = list(grouped_chunks.get(ChunkType.SUMMARY, []))
 
         try:
-            raw_chunks = await self._embed_raw(article, raw_chunks)
+            if (len(full_text_chunks) <= 0):
+                raw_chunks = await self._embed_raw(article, raw_chunks)
             await self._generate_full_text(article, raw_chunks)
             full_text_chunks = await self._embed_full_text(article, full_text_chunks)
             await self._generate_summary(article, full_text_chunks)
             summary_chunks = await self._embed_summary(article, summary_chunks)
+            await self._embed.remove_embeds(raw_chunks)
+            for chunk in raw_chunks:
+                await self._articles_dao.remove_chunk(chunk)
         except IndexingError as e:
             logger.warning("Failed to index article %s: %s", article.id, e.msg)
         except ApiError as e:

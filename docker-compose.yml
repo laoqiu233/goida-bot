@@ -17,13 +17,42 @@ services:
       PGPT_PROFILES: docker
       PGPT_MODE: ollama
       PGPT_EMBED_MODE: ollama
-      PGPT_OLLAMA_API_BASE: http://host.docker.internal:11434
-      PGPT_OLLAMA_EMBEDDING_API_BASE: http://host.docker.internal:11434
+      PGPT_OLLAMA_API_BASE: http://goida-bot-ollama-1:11434
+      PGPT_OLLAMA_EMBEDDING_API_BASE: http://goida-bot-ollama-1:11434
       PGPT_OLLAMA_LLM_MODEL: my-model
       PGPT_OLLAMA_EMBEDDING_MODEL: my-embed
       PGPT_EMBED_DIM: 1024
       POSTGRES_PASSWORD: goida
     restart: always
+    depends_on:
+      ollama:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+  ollama:
+    image: traefik:v2.10
+    healthcheck:
+      test: ["CMD", "sh", "-c", "wget -q --spider http://ollama:11434 || exit 1"]
+      interval: 10s
+      retries: 3
+      start_period: 5s
+      timeout: 5s
+    ports:
+      - "8080:8080"
+    expose:
+      - 11434
+    command:
+      - "--providers.file.filename=/etc/router.yml"
+      - "--log.level=ERROR"
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:11434"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./.docker/router.yml:/etc/router.yml:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   postgres:
     image: pgvector/pgvector:pg16
     ports:
@@ -38,6 +67,8 @@ services:
     build:
       dockerfile: docker/migrate.Dockerfile
       context: .
+    depends_on:
+      - postgres
   fetcher:
     build:
       dockerfile: docker/fetcher.Dockerfile
